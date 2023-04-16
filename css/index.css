@@ -1,0 +1,418 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition-timing-function: cubic-bezier(.19, 1, .22, 1);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    position: absolute;
+}
+
+.img1 {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url(../img/人之律者.png);
+    background-attachment: fixed;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    overflow: hidden;
+}
+
+.img1_text {
+    text-align: center;
+    color: #111;
+    font-size: 27px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+#img1_text {
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+}
+
+.footer {
+    width: 100vw;
+    height: 30vh;
+    overflow: hidden;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text1 {
+    margin: 50px 80px;
+    color: rgb(255, 154, 252);
+    font-size: 20px;
+    text-align: center;
+}
+
+.img2 {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url(../img/Elysia_1.jpg);
+    background-attachment: fixed;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    overflow: hidden;
+}
+
+.img2_text {
+    width: 33%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img2_text_h1 {
+    background-color: #111;
+    color: #fff;
+    font-size: 27px;
+    letter-spacing: 8px;
+    padding: 20px;
+    cursor: pointer;
+    animation: border_1 1.5s infinite;
+}
+
+.container {
+    position: relative;
+}
+
+.img2_hide {
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img2_hide_inside {
+    width: 80vw;
+    height: 85vh;
+    position: relative;
+    background-image: url(../img/Elysia_2.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    display: none;
+}
+
+@media(min-width: 1300px) {
+    .img2_hide_inside {
+        background-size: 100%;
+    }
+}
+
+.inside_box_1 {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.inside_box_text {
+    text-align: left;
+    font-size: 15px;
+    margin: auto;
+    font-weight: 500;
+    line-height: 2em;
+    display: block;
+    text-indent: 2em;
+    backdrop-filter: blur(2px);
+}
+
+.tac_box {
+    text-align: center;
+    margin: auto;
+    line-height: 2em;
+    display: block;
+    backdrop-filter: blur(2px);
+}
+
+.pink {
+    color: rgb(255, 154, 252);
+    display: inline;
+}
+
+.hide {
+    color: transparent;
+    background-color: #111;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.hide:hover {
+    color: rgb(255, 154, 252);
+    background-color: transparent;
+}
+
+.inside_text_1 {
+    transform-origin: center center;
+    width: 60vw;
+    height: 65vh;
+    position: absolute;
+    left: 10vw;
+    top: 10vh;
+}
+
+#pdclose {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    float: right;
+    position: relative;
+    overflow: hidden;
+    /* margin-top: 10px; */
+    transition: all .5s;
+    flex: 0 0 auto;
+}
+
+#pdclose:hover {
+    transform: rotate(90deg);
+}
+
+#pdclose:after {
+    width: 100%;
+    position: absolute;
+    height: 3px;
+    background: #fff;
+    content: "";
+    top: 9px;
+    left: 0;
+    transform: rotate(134deg);
+    -ms-transform: rotate(134deg);
+    -moz-transform: rotate(134deg);
+    -webkit-transform: rotate(134deg);
+    -o-transform: rotate(134deg);
+
+}
+
+#pdclose:before {
+    width: 100%;
+    position: absolute;
+    height: 3px;
+    background: #fff;
+    content: "";
+    top: 9px;
+    right: 0;
+    transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+}
+
+.img3 {
+    width: 100vw;
+    height: 200vh;
+    position: relative;
+    opacity: 0.75;
+}
+
+.img_1 {
+    width: 100vw;
+    height: 50vh;
+    background-image: url(../img/about_1.jpg);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+.img_2 {
+    width: 100vw;
+    height: 50vh;
+    background-image: url(../img/about_2.jpg);
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: right center;
+    background-attachment: fixed;
+}
+
+.img_3 {
+    width: 100vw;
+    height: 50vh;
+    background-image: url(../img/about_3.jpg);
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: right center;
+    background-attachment: fixed;
+}
+
+.img_4 {
+    width: 100vw;
+    height: 50vh;
+    background-image: url(../img/about_4.jpg);
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: left center;
+    background-attachment: fixed;
+}
+
+@media (min-width:1450px) {
+
+    .img_1,
+    .img_2,
+    .img_3,
+    .img_4 {
+        background-size: 110%;
+    }
+}
+
+.footer_1 {
+    width: 100vw;
+    height: 40vh;
+    overflow: hidden;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.footer_text {
+    margin: 0 50px;
+    text-align: center;
+    color: pink;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.footer_2 {
+    width: 100vw;
+    height: 70vh;
+    overflow: hidden;
+    background-color: #f9b2bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 10vw;
+}
+
+.end_text {
+    font-size: 2em;
+    font-weight: 500;
+    color: #901A1A;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    margin: 3em 0;
+    padding: 0;
+    background-image: -webkit-linear-gradient(left, #ccc, #fff, #ccc);
+    background-image: -moz-linear-gradient(left, #ccc, #fff, #ccc);
+    background-image: -ms-linear-gradient(left, #ccc, #fff, #ccc);
+    background-image: -o-linear-gradient(left, #ccc, #fff, #ccc);
+    width: 50%;
+    /* left: 25%; */
+    /* position: relative; */
+    border: none;
+}
+
+#end {
+    width: 100vw;
+    height: 10vh;
+    background-color: rgb(241, 195, 79);
+    color: #fff;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+a {
+    text-decoration: none;
+    color: coral;
+    transition: all .3s;
+}
+
+a:hover {
+    color: #fff;
+}
+
+.music {
+    width: 80vw;
+}
+
+@media (min-width:600px) {
+    .music {
+        width: 400px;
+    }
+}
+
+
+@media (max-width:580px) {
+    .img1 {
+        background-image: url(../img/人之律者m.png);
+    }
+
+    h1 {
+        font-size: 1.6em;
+    }
+
+    h2 {
+        font-size: 1.3em;
+    }
+
+    .img2_hide_inside {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .inside_text_1 {
+        left: 20vw;
+    }
+
+    hr {
+        display: none;
+    }
+
+    .footer_1 {
+        height: 50vh;
+    }
+}
+
+
+
+@font-face {
+    font-family: HFPoet;
+    src: url(../ttf/HFPoet.ttf);
+}
+
+@keyframes border_1 {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+    }
+}
