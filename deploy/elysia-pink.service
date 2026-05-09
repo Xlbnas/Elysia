@@ -1,0 +1,35 @@
+[Unit]
+Description=Elysia.pink — 爱莉希雅，我爱你 ♡
+Documentation=https://github.com/Xlbnas/Elysia
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+# 工作目录必须含有 public/ 文件夹（静态资源）
+WorkingDirectory=/opt/elysia-pink
+
+# 二进制路径（install.sh 会放到这里）
+ExecStart=/opt/elysia-pink/elysia-pink-linux-x64
+
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elysia-pink
+
+# 环境变量
+Environment=PORT=3000
+Environment=NODE_ENV=production
+
+# 安全加固（可选）
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/elysia-pink
+
+[Install]
+WantedBy=multi-user.target

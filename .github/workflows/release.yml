@@ -1,0 +1,90 @@
+name: Build & Release
+
+# 触发条件：推送 v* 格式的 tag（如 v2.1.0）
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write   # 需要写权限才能创建 Release
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - target: bun-linux-x64
+            artifact: elysia-pink-linux-x64
+          - target: bun-linux-arm64
+            artifact: elysia-pink-linux-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --production
+
+      - name: Compile binary
+        run: |
+          bun build --compile --target=${{ matrix.target }} \
+            src/index.ts \
+            --outfile ${{ matrix.artifact }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Elysia.pink ${{ github.ref_name }}"
+          body: |
+            ## 爱莉希雅，我爱你 ♡  —  ${{ github.ref_name }}
+
+            ### 二进制下载
+
+            | 平台 | 文件 |
+            |------|------|
+            | Linux x86_64 | `elysia-pink-linux-x64` |
+            | Linux ARM64  | `elysia-pink-linux-arm64` |
+
+            ### 快速部署
+
+            ```bash
+            # Linux x64 示例
+            wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/elysia-pink-linux-x64
+            chmod +x elysia-pink-linux-x64
+            ./elysia-pink-linux-x64
+            ```
+
+            完整部署（含 systemd）见 [deploy/README.md](deploy/README.md)
+          files: artifacts/*
+          draft: false
+          prerelease: false

@@ -6,10 +6,11 @@ node_modules/
 .env.local
 .env.*.local
 
-# 构建输出
+# 构建输出（bin/ 由 GitHub Actions 生成，不手动提交）
 dist/
 build/
 .output/
+bin/
 
 # 日志
 *.log

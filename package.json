@@ -4,7 +4,11 @@
   "description": "爱莉希雅，我爱你 ♡ — Elysia.pink 重构版，基于 Elysia.js + Bun",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "start": "bun src/index.ts"
+    "start": "bun src/index.ts",
+    "build": "bun build --compile src/index.ts --outfile bin/elysia-pink",
+    "build:linux-x64": "bun build --compile --target=bun-linux-x64 src/index.ts --outfile bin/elysia-pink-linux-x64",
+    "build:linux-arm64": "bun build --compile --target=bun-linux-arm64 src/index.ts --outfile bin/elysia-pink-linux-arm64",
+    "build:all": "bun run build:linux-x64 && bun run build:linux-arm64"
   },
   "dependencies": {
     "@elysiajs/html": "^1.1.3",
