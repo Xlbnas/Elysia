@@ -1,10 +1,18 @@
 name: Build & Release
 
-# 触发条件：推送 v* 格式的 tag（如 v2.1.0）
+# 触发条件：
+#   1. 推送 v* 格式的 tag（如 v2.1.0）—— 自动触发
+#   2. workflow_dispatch —— 在 GitHub Actions 页面手动点击触发
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（如 v2.0.0）'
+        required: true
+        default: 'v2.0.0'
 
 permissions:
   contents: write   # 需要写权限才能创建 Release
@@ -61,12 +69,22 @@ jobs:
           path: artifacts/
           merge-multiple: true
 
+      - name: Resolve version tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Elysia.pink ${{ github.ref_name }}"
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Elysia.pink ${{ steps.version.outputs.tag }}"
           body: |
-            ## 爱莉希雅，我爱你 ♡  —  ${{ github.ref_name }}
+            ## 爱莉希雅，我爱你 ♡  —  ${{ steps.version.outputs.tag }}
 
             ### 二进制下载
 
@@ -79,7 +97,7 @@ jobs:
 
             ```bash
             # Linux x64 示例
-            wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/elysia-pink-linux-x64
+            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/elysia-pink-linux-x64
             chmod +x elysia-pink-linux-x64
             ./elysia-pink-linux-x64
             ```
