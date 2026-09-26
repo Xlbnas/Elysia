@@ -14,42 +14,61 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare existing character assets
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Prepare existing artwork and source archive
         run: |
-          python -m pip install Pillow
-          mkdir -p review/mood/assets
+          python -m pip install Pillow playwright
+          mkdir -p review/mood/assets source-mood/public/mood source-mood/src/views source-mood/scripts
+          cp public/mood/* source-mood/public/mood/
+          cp src/views/home.tsx source-mood/src/views/
+          cp scripts/mood-* source-mood/scripts/
           python - <<'PY'
-          from PIL import Image, ImageDraw
+          from PIL import Image
           from pathlib import Path
           import json
-          manifest=[]
-          sheets=[]
-          for p in Path('public/img').iterdir():
-            if p.suffix.lower() not in ('.jpg','.jpeg','.png','.webp'): continue
-            im=Image.open(p)
-            manifest.append({'file':str(p),'size':im.size,'mode':im.mode,'bytes':p.stat().st_size})
-            im.thumbnail((1400,1400))
+          result=[]
+          for name in ['人之律者.png','about_3.jpg','Elysia_3.jpg','ico.png']:
+            p=Path('public/img')/name
+            im=Image.open(p); im.thumbnail((1680,1200))
             out=Path('review/mood/assets')/(p.stem+'.webp')
-            im.save(out,'WEBP',quality=85)
-            thumb=Image.new('RGB',(420,300),'#21162c')
-            im.thumbnail((420,265))
-            if im.mode=='RGBA': thumb.paste(im,((420-im.width)//2,0),im)
-            else: thumb.paste(im.convert('RGB'),((420-im.width)//2,0))
-            ImageDraw.Draw(thumb).text((8,278),p.name.encode('ascii','replace').decode(),fill='white')
-            sheets.append(thumb)
-          contact=Image.new('RGB',(1260,((len(sheets)+2)//3)*300),'#21162c')
-          for i,t in enumerate(sheets): contact.paste(t,((i%3)*420,(i//3)*300))
-          contact.save('review/mood/contact.jpg')
-          Path('review/mood/assets.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+            im.save(out,'WEBP',quality=88)
+            result.append({'source':str(p),'export':str(out),'dimensions':im.size,'bytes':out.stat().st_size})
+          Path('review/mood/asset-manifest.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-      - name: Build and check mood page when present
+      - name: Build static and offline versions
         run: |
-          if [ -f scripts/mood-build.mjs ]; then node scripts/mood-build.mjs; fi
-          if [ -f scripts/mood-check.mjs ]; then node scripts/mood-check.mjs; fi
+          node --check public/mood/world.js
+          node scripts/mood-build.mjs > review/mood/build.json
+      - name: Verify original Bun entrypoint and compiled binary
+        run: |
+          bun install --frozen-lockfile --production
+          PORT=4176 bun src/index.ts > /tmp/elysia-bun.log 2>&1 &
+          server=$!
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4176/ > /tmp/elysia-home.html && break || sleep 0.2; done
+          grep -q 'id="world"' /tmp/elysia-home.html
+          curl -fsS http://127.0.0.1:4176/mood/world.js > /dev/null
+          kill "$server"
+          bun build --compile src/index.ts --outfile /tmp/elysia-mood
+          PORT=4177 /tmp/elysia-mood > /tmp/elysia-binary.log 2>&1 &
+          server=$!
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4177/ > /tmp/elysia-home-compiled.html && break || sleep 0.2; done
+          grep -q 'id="world"' /tmp/elysia-home-compiled.html
+          kill "$server"
+          printf '{"bunEntry":"pass","compiledEntry":"pass","productionModified":false}\n' > review/mood/integration.json
+      - name: Install test browsers
+        run: python -m playwright install --with-deps chromium webkit
+      - name: Exercise the real website in Chromium and WebKit
+        run: |
+          python -m http.server 4175 --directory dist-mood > /tmp/elysia-static.log 2>&1 &
+          python scripts/mood-check.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: elysia-mood-preview
           path: |
             review/mood/
             dist-mood/
+            source-mood/
           retention-days: 7
