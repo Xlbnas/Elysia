@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 
@@ -8,9 +8,7 @@ await mkdir(join(out, 'mood'), { recursive: true });
 await mkdir(join(out, 'img'), { recursive: true });
 let html = await readFile('public/mood/page.html', 'utf8');
 let js = await readFile('public/mood/world.js', 'utf8');
-let css = await readFile('public/mood/style.css', 'utf8');
-// A larger mobile hit target and spacing for short screens.
-css += '\n@media(max-width:760px){.credits{min-height:44px}.scene-nav{bottom:44px}}\n@media(max-height:520px) and (min-width:560px){.scene-nav{bottom:0}}\n@media(max-width:380px){.bloom-button{bottom:26%}}\n';
+const css = await readFile('public/mood/style.css', 'utf8') + '\n' + await readFile('public/mood/viewport.css', 'utf8');
 const assets = [
  ['人之律者.png', '人之律者.webp', 'hero.webp'],
  ['about_3.jpg', 'about_3.webp', 'garden.webp'],
@@ -39,7 +37,7 @@ await writeFile(join(out, 'mood/style.css'), css);
 await writeFile(join(out, 'mood/world.js'), js);
 let offline = html.replace('<link rel="stylesheet" href="./mood/style.css">', `<style>${css}</style>`)
  .replace('<script src="./mood/world.js" defer></script>', '');
-let offlineJS = js.replace("const assetURL=file=>new URL('./img/'+encodeURIComponent(file),document.baseURI).href;", `const assetURL=file=>(${JSON.stringify(embedded)})[file];`);
+const offlineJS = js.replace("const assetURL=file=>new URL('./img/'+encodeURIComponent(file),document.baseURI).href;", `const assetURL=file=>(${JSON.stringify(embedded)})[file];`);
 for (const [name, data] of Object.entries(embedded)) offline = offline.replaceAll('./img/' + name, data);
 offline = offline.replace('</body>', '<script>' + offlineJS + '</script></body>');
 await writeFile(join(out, 'elysia-offline.html'), offline);
