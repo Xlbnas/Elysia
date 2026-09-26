@@ -1,0 +1,55 @@
+name: Elysia mood preview (no deployment)
+on:
+  push:
+    branches: ['codex/elysia-mood-world-20260926']
+    paths: ['public/mood/**', 'src/views/home.tsx', 'scripts/mood-*', '.github/workflows/mood-preview.yml']
+permissions:
+  contents: read
+concurrency:
+  group: elysia-mood-preview
+  cancel-in-progress: true
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare existing character assets
+        run: |
+          python -m pip install Pillow
+          mkdir -p review/mood/assets
+          python - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import json
+          manifest=[]
+          sheets=[]
+          for p in Path('public/img').iterdir():
+            if p.suffix.lower() not in ('.jpg','.jpeg','.png','.webp'): continue
+            im=Image.open(p)
+            manifest.append({'file':str(p),'size':im.size,'mode':im.mode,'bytes':p.stat().st_size})
+            im.thumbnail((1400,1400))
+            out=Path('review/mood/assets')/(p.stem+'.webp')
+            im.save(out,'WEBP',quality=85)
+            thumb=Image.new('RGB',(420,300),'#21162c')
+            im.thumbnail((420,265))
+            if im.mode=='RGBA': thumb.paste(im,((420-im.width)//2,0),im)
+            else: thumb.paste(im.convert('RGB'),((420-im.width)//2,0))
+            ImageDraw.Draw(thumb).text((8,278),p.name.encode('ascii','replace').decode(),fill='white')
+            sheets.append(thumb)
+          contact=Image.new('RGB',(1260,((len(sheets)+2)//3)*300),'#21162c')
+          for i,t in enumerate(sheets): contact.paste(t,((i%3)*420,(i//3)*300))
+          contact.save('review/mood/contact.jpg')
+          Path('review/mood/assets.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+          PY
+      - name: Build and check mood page when present
+        run: |
+          if [ -f scripts/mood-build.mjs ]; then node scripts/mood-build.mjs; fi
+          if [ -f scripts/mood-check.mjs ]; then node scripts/mood-check.mjs; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: elysia-mood-preview
+          path: |
+            review/mood/
+            dist-mood/
+          retention-days: 7
