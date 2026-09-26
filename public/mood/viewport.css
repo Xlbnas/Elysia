@@ -1,0 +1,4 @@
+/* Shared by the Bun homepage and static export: keep small-screen targets usable. */
+@media(max-width:760px){.credits{min-height:44px}.scene-nav{bottom:44px}}
+@media(max-height:520px) and (min-width:560px){.scene-nav{bottom:0}}
+@media(max-width:380px){.bloom-button{bottom:26%}}
